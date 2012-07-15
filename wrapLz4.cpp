@@ -31,7 +31,7 @@ int gimLz4Decompress(const MemoryC& _input, Gubyte* output)
     MemoryC::ValueType* input = _input.ptr;
     while (true) {
         if (0 == inSize) {
-            return -1;
+            return -Error_Premature_End_Of_Data;
         }
         Gubyte token = *input++;
         --inSize;
@@ -40,7 +40,7 @@ int gimLz4Decompress(const MemoryC& _input, Gubyte* output)
         if (Run_Mask == len) {
             Gubyte lenContinued = 255;
             while (lenContinued == 255) {
-                if (1 > inSize) { return -2; }
+                if (1 > inSize) { return -Error_Premature_End_Of_Data; }
                 lenContinued = *input++;
                 --inSize;
                 len += lenContinued;
@@ -48,7 +48,7 @@ int gimLz4Decompress(const MemoryC& _input, Gubyte* output)
         }
 
         if (len > inSize) {
-            return -3;
+            return -Error_Premature_End_Of_Data;
         }
         // copy literals
         memcpy(output, input, len);
@@ -67,7 +67,7 @@ int gimLz4Decompress(const MemoryC& _input, Gubyte* output)
         //get offset
         if (2 > inSize) {
             ::fprintf(stderr, "insize: %d, output: %d, len: %d\n", inSize, copied, len);
-            return -4;
+            return -Error_Premature_End_Of_Data;
         }
         Gushort offset = *(Gushort*)input;
         input += 2;
@@ -77,7 +77,7 @@ int gimLz4Decompress(const MemoryC& _input, Gubyte* output)
         if (Match_Len_Mask == len) {
             Gubyte lenContinued = 255;
             while (lenContinued == 255) {
-                if (1 > inSize) { return -5; }
+                if (1 > inSize) { return -Error_Premature_End_Of_Data; }
                 lenContinued = *input++;
                 --inSize;
                 len += lenContinued;
@@ -85,12 +85,12 @@ int gimLz4Decompress(const MemoryC& _input, Gubyte* output)
         }
 
         if (offset > copied) {
-            return -6;
+            return -Error_Invalid_Distance;
         }
 
         int temp = (int)offset;
         if (offset == 0) {
-            return -7;
+            return -Error_Invalid_Distance;
         }
         len += Minimal_Match;
 
@@ -133,29 +133,29 @@ int gimLz4Decompress(const MemoryC& _input, Gubyte* output)
 }
 
 
-unsigned lz4_inflate(Gubyte** out, size_t* outSize, const MemoryC& input, const LodePNGDecompressSettings& settings)
+unsigned int lz4_inflate(Gubyte** out, size_t* outSize, const MemoryC& input, const LodePNGDecompressSettings& settings)
 {
     ::fprintf(stderr, "inflate ptr: %8p, %d in: %d\n", *out, *outSize, input.count);
     
     // -4 due to appended CRC crap ;p
     //int res = LZ4_uncompress(inMem, outMem, inSize - 4);
-    int res = gimLz4Decompress(MemoryC(input.ptr, input.count-4), *out);
+    int res = gimLz4Decompress(MemoryC(input.ptr, input.count - 4), *out);
     if (res < 0) {
         ::fprintf(stderr, "decompression error %d\n", res);
-        return -1;
+        return -res;
     }
     *outSize = res;
     return 0;
 }
 
-unsigned lz4_deflate(Gubyte** out, size_t* outSize, const MemoryC& input, const LodePNGCompressSettings& settings)
+unsigned int lz4_deflate(Gubyte** out, size_t* outSize, const MemoryC& input, const LodePNGCompressSettings& settings)
 {
     size_t worstCase = LZ4_compressBound(input.count);
     if (0 == *out || *outSize < worstCase) {
         void* temp = ::realloc(*out, worstCase);
         if (0 == temp) {
             ::fprintf(stderr, "memory allocation problem\n");
-            return -1;
+            return Error_Memory_Allocation;
         }
         *out = static_cast<unsigned char*>( temp );
     }
@@ -164,7 +164,7 @@ unsigned lz4_deflate(Gubyte** out, size_t* outSize, const MemoryC& input, const 
     int res = LZ4_compressHC(input.as<const char>().ptr, reinterpret_cast<char*>(*out), input.count);
     if (res < 0) {
         ::fprintf(stderr, "compression error\n");
-        return -1;
+        return Error_Compression;
     }
     *outSize = res;
     ::fprintf(stderr, "deflate outSize: %d\n", res);
