@@ -6,7 +6,6 @@
 #include <cstdio>
 #include <cstdlib>
 
-
 using gim::pod::MemoryC;
 
 // I had a problem when using original LZ4_uncompress...
