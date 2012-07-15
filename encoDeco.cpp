@@ -4,8 +4,10 @@
 
 #include <iostream>
 
-typedef unsigned (*Inflate)(unsigned char**, size_t*, const unsigned char*, size_t, const LodePNGDecompressSettings*);
-typedef unsigned (*Deflate)(unsigned char**, size_t*, const unsigned char*, size_t, const LodePNGCompressSettings*);
+using gim::pod::MemoryC;
+
+typedef unsigned (*Inflate)(Gubyte**, size_t*, const MemoryC&, const LodePNGDecompressSettings&);
+typedef unsigned (*Deflate)(Gubyte**, size_t*, const MemoryC&, const LodePNGCompressSettings&);
  
 Inflate gimInflate;
 Deflate gimDeflate;
@@ -36,7 +38,7 @@ unsigned lodepng_custom_inflate(
         size_t inSize,
         const LodePNGDecompressSettings* settings)
 {
-    gimInflate(outBufPtr, outSize, inBuf, inSize, settings);
+    gimInflate(outBufPtr, outSize, MemoryC(inBuf, inSize), *settings);
 }
 unsigned lodepng_custom_deflate(
         unsigned char** outBufPtr,
@@ -45,7 +47,7 @@ unsigned lodepng_custom_deflate(
         size_t inSize,
         const LodePNGCompressSettings* settings)
 {
-    gimDeflate(outBufPtr, outSize, inBuf, inSize, settings);
+    gimDeflate(outBufPtr, outSize, MemoryC(inBuf, inSize), *settings);
 }
 
 int main(int argc, char **argv)

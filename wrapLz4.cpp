@@ -6,13 +6,11 @@
 #include <cstdio>
 #include <cstdlib>
 
-typedef unsigned char        Gubyte;
-typedef unsigned short       Gushort;
-typedef unsigned int         Guint;
-typedef unsigned long long   Gulong;
+
+using gim::pod::MemoryC;
 
 // I had a problem when using original LZ4_uncompress...
-int gimLz4Decompress(const Gubyte* input, Gubyte* output, int inSize)
+int gimLz4Decompress(const MemoryC& _input, Gubyte* output)
 {
     static const size_t Match_Len_Bits = 4;
     static const size_t Run_Bits = 8 - Match_Len_Bits;
@@ -28,6 +26,9 @@ int gimLz4Decompress(const Gubyte* input, Gubyte* output, int inSize)
 #else
 #define LZ4COUNTER(x)
 #endif
+
+    size_t inSize = _input.count;
+    MemoryC::ValueType* input = _input.ptr;
     while (true) {
         if (0 == inSize) {
             return -1;
@@ -132,29 +133,24 @@ int gimLz4Decompress(const Gubyte* input, Gubyte* output, int inSize)
 }
 
 
-unsigned lz4_inflate(unsigned char** out, size_t* outsize, const unsigned char* in, size_t inSize, const LodePNGDecompressSettings* settings)
+unsigned lz4_inflate(Gubyte** out, size_t* outSize, const MemoryC& input, const LodePNGDecompressSettings& settings)
 {
-    ::fprintf(stderr, "inflate ptr: %8p, %d in: %d\n", *out, *outsize, inSize);
-
-    //const char* inMem = reinterpret_cast<const char*>(in);
-    //char* outMem = reinterpret_cast<char*>(*out);
+    ::fprintf(stderr, "inflate ptr: %8p, %d in: %d\n", *out, *outSize, input.count);
+    
     // -4 due to appended CRC crap ;p
     //int res = LZ4_uncompress(inMem, outMem, inSize - 4);
-    
-    int res = gimLz4Decompress(in, *out, inSize - 4);
+    int res = gimLz4Decompress(MemoryC(input.ptr, input.count-4), *out);
     if (res < 0) {
         ::fprintf(stderr, "decompression error %d\n", res);
         return -1;
     }
-    Gubyte* tempBuf = *out;
-    //hexDump(tempBuf, res);
-    *outsize = res;
+    *outSize = res;
     return 0;
 }
 
-unsigned lz4_deflate(unsigned char** out, size_t* outSize, const unsigned char* in, size_t inSize, const LodePNGCompressSettings* settings)
+unsigned lz4_deflate(Gubyte** out, size_t* outSize, const MemoryC& input, const LodePNGCompressSettings& settings)
 {
-    size_t worstCase = LZ4_compressBound(inSize);
+    size_t worstCase = LZ4_compressBound(input.count);
     if (0 == *out || *outSize < worstCase) {
         void* temp = ::realloc(*out, worstCase);
         if (0 == temp) {
@@ -163,14 +159,13 @@ unsigned lz4_deflate(unsigned char** out, size_t* outSize, const unsigned char* 
         }
         *out = static_cast<unsigned char*>( temp );
     }
-    ::fprintf(stderr, "deflate ptr: %8p, %d in: %d\n", *out, *outSize, inSize);
+    ::fprintf(stderr, "deflate ptr: %8p, %d in: %d\n", *out, *outSize, input.count);
     *outSize = 0;
-    int res = LZ4_compressHC(reinterpret_cast<const char*>(in), reinterpret_cast<char*>(*out), inSize);
+    int res = LZ4_compressHC(input.as<const char>().ptr, reinterpret_cast<char*>(*out), input.count);
     if (res < 0) {
         ::fprintf(stderr, "compression error\n");
         return -1;
     }
-    //hexDump(in, inSize);
     *outSize = res;
     ::fprintf(stderr, "deflate outSize: %d\n", res);
 

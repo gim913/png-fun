@@ -1,7 +1,8 @@
 #pragma once
 
+#include "wrappers.h"
 #include "lodepng.h"
 
-unsigned lz4_inflate(unsigned char**, size_t*, const unsigned char*, size_t, const LodePNGDecompressSettings*);
-unsigned lz4_deflate(unsigned char**, size_t*, const unsigned char*, size_t, const LodePNGCompressSettings*);
+unsigned lz4_inflate(Gubyte**, size_t*, const gim::pod::MemoryC&, const LodePNGDecompressSettings&);
+unsigned lz4_deflate(Gubyte**, size_t*, const gim::pod::MemoryC&, const LodePNGCompressSettings&);
 

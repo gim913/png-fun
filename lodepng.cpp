@@ -1311,7 +1311,7 @@ unsigned lodepng_inflate(unsigned char** out, size_t* outsize,
     *out = v.data;
     *outsize = v.size;
 #ifdef LODEPNG_WANT_TIMER
-    lodepng_timer_stop("idecomp: ", tempTimer);
+    lodepng_timer_stop("original load ", tempTimer);
 #endif
     return error;
 #if LODEPNG_CUSTOM_ZLIB_DECODER == 2
