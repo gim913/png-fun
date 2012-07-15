@@ -1,6 +1,7 @@
 #include "lodepng.h"
 
 #include "wrapLz4.h"
+#include "wrapLzham.h"
 
 #include <iostream>
 
@@ -49,11 +50,6 @@ unsigned lodepng_custom_deflate(
 {
     gimDeflate(outBufPtr, outSize, MemoryC(inBuf, inSize), *settings);
 }
-namespace lzham {
-    Guint lzham_get_max_helper_threads() {
-        return 0;
-    }
-}
 
 int main(int argc, char **argv)
 {
@@ -62,8 +58,8 @@ int main(int argc, char **argv)
     }
     std::cout << "converting..." << std::endl;
 
-    gimDeflate = &lz4_deflate;
-    gimInflate = &lz4_inflate;
+    gimDeflate = &lzham_deflate;
+    gimInflate = &lzham_inflate;
     resave(argv[1], argv[2]);
     return 0;
 }
