@@ -163,7 +163,7 @@ unsigned int lz4_deflate(Gubyte** out, size_t* outSize, const MemoryC& input, co
     int res = LZ4_compressHC(input.as<const char>().ptr, reinterpret_cast<char*>(*out), input.count);
     if (res < 0) {
         std::fprintf(stderr, "compression error\n");
-        return Error_Compression;
+        return Error_General_Compression;
     }
     *outSize = res;
     std::fprintf(stderr, "deflate outSize: %d\n", res);

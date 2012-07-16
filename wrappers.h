@@ -14,6 +14,7 @@ enum {
     Error_Invalid_Distance = 18,
     Error_Premature_End_Of_Data = 22,
     Error_Memory_Allocation = 83,
-    Error_Compression = 256
+    Error_General_Compression = 256,
+    Error_General_Decompression = 257,
 };
 
