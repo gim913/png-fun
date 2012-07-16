@@ -8,6 +8,7 @@ namespace gim { namespace pod {
 
 } }
 
+void hexDump(const gim::pod::MemoryC& mem);
 
 enum {
     Error_Invalid_Distance = 18,

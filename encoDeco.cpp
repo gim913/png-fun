@@ -31,6 +31,21 @@ void resave(const char* filename, const char* outName)
   //std::cout << "saved..." << std::endl;
 }
 
+#include <cstdio>
+
+void hexDump(const MemoryC& mem)
+{
+    /*
+    FILE* fp = fopen("hexdump.bin", "w");
+    for (size_t i = 0; i < mem.count; ++i) {
+        std::fprintf(fp, "%02x ", mem.ptr[i]);
+        if (!((i+1)%16)) {
+            std::fprintf(fp, "\n");
+        }
+    }
+    std::fclose(fp);
+    */
+}
 
 unsigned lodepng_custom_inflate(
         unsigned char** outBufPtr,

@@ -23,10 +23,10 @@ void lodepng_timer_stop(const char* prefix, void* timerStart)
         diff_s -= 1;
         diff_u += 1000000;
     }
-    ::fprintf(stderr, "%s time ", prefix);
+    std::fprintf(stderr, "%s time ", prefix);
     if (diff_s)
-        ::fprintf(stderr, "%d", diff_s);
-    ::fprintf(stderr, "%06d us\n", diff_u);
+        std::fprintf(stderr, "%d", diff_s);
+    std::fprintf(stderr, "%06d us\n", diff_u);
 }
 
 

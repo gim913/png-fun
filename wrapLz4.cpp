@@ -3,8 +3,8 @@
 #include "lz4-read-only/lz4.h"
 #include "lz4-read-only/lz4hc.h"
 
-#include <cstdio>
 #include <cstdlib>
+#include <cstdio>
 
 using gim::pod::MemoryC;
 
@@ -59,13 +59,13 @@ int gimLz4Decompress(const MemoryC& _input, Gubyte* output)
 
         // specific to original implementation, end of stream is 5 literal bytes
         if (0 == inSize) {
-            ::fprintf(stderr, "%d bytes written, quitting, due to lack of more data\n", copied);
+            std::fprintf(stderr, "%d bytes written, quitting, due to lack of more data\n", copied);
             break; // !!! !!! !!!
         }
 
         //get offset
         if (2 > inSize) {
-            ::fprintf(stderr, "insize: %d, output: %d, len: %d\n", inSize, copied, len);
+            std::fprintf(stderr, "insize: %d, output: %d, len: %d\n", inSize, copied, len);
             return -Error_Premature_End_Of_Data;
         }
         Gushort offset = *(Gushort*)input;
@@ -125,7 +125,7 @@ int gimLz4Decompress(const MemoryC& _input, Gubyte* output)
         copied += len;
     }
 #ifdef LZ4_DEBUG_COUNTERS
-    ::fprintf(stderr, "counters: %d %d %d\n", statCounter[0], statCounter[1], statCounter[2]);
+    std::fprintf(stderr, "counters: %d %d %d\n", statCounter[0], statCounter[1], statCounter[2]);
 #endif
 
     return copied;
@@ -134,13 +134,13 @@ int gimLz4Decompress(const MemoryC& _input, Gubyte* output)
 
 unsigned int lz4_inflate(Gubyte** out, size_t* outSize, const MemoryC& input, const LodePNGDecompressSettings& settings)
 {
-    ::fprintf(stderr, "inflate ptr: %8p, %d in: %d\n", *out, *outSize, input.count);
+    std::fprintf(stderr, "inflate ptr: %8p, %d in: %d\n", *out, *outSize, input.count);
     
     // -4 due to appended CRC crap ;p
     //int res = LZ4_uncompress(inMem, outMem, inSize - 4);
     int res = gimLz4Decompress(MemoryC(input.ptr, input.count - 4), *out);
     if (res < 0) {
-        ::fprintf(stderr, "decompression error %d\n", res);
+        std::fprintf(stderr, "decompression error %d\n", res);
         return -res;
     }
     *outSize = res;
@@ -151,22 +151,22 @@ unsigned int lz4_deflate(Gubyte** out, size_t* outSize, const MemoryC& input, co
 {
     size_t worstCase = LZ4_compressBound(input.count);
     if (0 == *out || *outSize < worstCase) {
-        void* temp = ::realloc(*out, worstCase);
+        void* temp = std::realloc(*out, worstCase);
         if (0 == temp) {
-            ::fprintf(stderr, "memory allocation problem\n");
+            std::fprintf(stderr, "memory allocation problem\n");
             return Error_Memory_Allocation;
         }
         *out = static_cast<unsigned char*>( temp );
     }
-    ::fprintf(stderr, "deflate ptr: %8p, %d in: %d\n", *out, *outSize, input.count);
+    std::fprintf(stderr, "deflate ptr: %8p, %d in: %d\n", *out, *outSize, input.count);
     *outSize = 0;
     int res = LZ4_compressHC(input.as<const char>().ptr, reinterpret_cast<char*>(*out), input.count);
     if (res < 0) {
-        ::fprintf(stderr, "compression error\n");
+        std::fprintf(stderr, "compression error\n");
         return Error_Compression;
     }
     *outSize = res;
-    ::fprintf(stderr, "deflate outSize: %d\n", res);
+    std::fprintf(stderr, "deflate outSize: %d\n", res);
 
     return 0;
 }
