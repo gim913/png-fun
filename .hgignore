@@ -1,6 +1,9 @@
 syntax: glob
 lzham-read-only/
 lz4-read-only/
+libbsc-0b12f29/
 bin/
 *~
 *.png
+*.log
+*.o

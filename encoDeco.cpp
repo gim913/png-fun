@@ -68,14 +68,58 @@ unsigned lodepng_custom_deflate(
 
 int main(int argc, char **argv)
 {
-    if (argc != 3) {
+    if (argc != 4) {
         std::cout << "syntax error\n";
+        std::cout << argv[0] << " [codec] input output\n";
+        std::cout << "where [codec] is on of the following:\n";
+        std::cout << "\t4 - to use lz4 algorithm\n";
+        std::cout << "\th - to use lzham algorithm, can be followed by\n";
+        std::cout << "\t\tnumber 0-4 - compression level\n";
+        std::cout << "\t\td|p|dp - deterministic compression, polar coordinates, both\n";
+        std::cout << "\t\t\te.g: h4dp\n";
+        return -1;
     }
     std::cout << "converting..." << std::endl;
 
-    gimDeflate = &lzham_deflate;
-    gimInflate = &lzham_inflate;
-    resave(argv[1], argv[2]);
+    // i'm too lazy to use getopt, 
+    switch (argv[1][0]) {
+        case '4':
+            gimDeflate = &lz4_deflate;
+            gimInflate = &lz4_inflate;
+            std::cout << "lz4" << std::endl;
+            break;
+
+        case 'h':
+            gimDeflate = &lzham_deflate;
+            gimInflate = &lzham_inflate;
+
+            if (strlen(argv[1]) > 1 && std::isdigit(argv[1][1])) {
+                lzham_level =  argv[1][1] - '0';
+            }
+            std::cout << "lzham using compression level: " << lzham_level << std::endl;
+            if (strlen(argv[1]) > 2) {
+                if (argv[1][2] == 'p') {
+                    lzham_flags |= Lzham_Polar;
+                } else if (argv[1][2] == 'd') {
+                    lzham_flags |= Lzham_Deterministic;
+                }
+            }
+            if (strlen(argv[1]) > 3) {
+                if (argv[1][3] == 'p') {
+                    lzham_flags |= Lzham_Polar;
+                } else if (argv[1][3] == 'd') {
+                    lzham_flags |= Lzham_Deterministic;
+                }
+            }
+            std::cout << "lzham " << ((lzham_flags&Lzham_Polar)?"":"NOT ") << "using polar coordinates" << std::endl;
+            std::cout << "lzham " << ((lzham_flags&Lzham_Deterministic)?"":"NOT ") << "using deterministic compression" << std::endl;
+            break;
+        default:
+            std::cout << "uknown value in first argument" << std::endl;
+            return -1;
+    }
+
+    resave(argv[2], argv[3]);
     return 0;
 }
 

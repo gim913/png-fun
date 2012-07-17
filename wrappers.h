@@ -1,5 +1,7 @@
 #pragma once
 
+#include "lodepng.h"
+
 #include <gim/base/Memory.hpp>
 
 namespace gim { namespace pod {

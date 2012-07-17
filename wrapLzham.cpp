@@ -7,6 +7,10 @@
 
 using gim::pod::MemoryC;
 
+int lzham_level = 4;
+int lzham_flags = 0;
+
+// apparently not implemented for *nixes
 namespace lzham {
     Guint lzham_get_max_helper_threads() {
         return 0;
@@ -43,8 +47,12 @@ unsigned int lzham_deflate(Gubyte** out, size_t* outSize, const MemoryC& input, 
     params.m_struct_size = sizeof(lzham_compress_params);
     params.m_dict_size_log2 = 26; // 64 M
     params.m_max_helper_threads = 0;
-    params.m_level = LZHAM_COMP_LEVEL_BETTER;
-    //params.m_compress_flags |= LZHAM_COMP_FLAG_FORCE_POLAR_CODING;
+    
+    params.m_level = (lzham_compress_level)lzham_level;
+    if (lzham_flags & Lzham_Polar)
+        params.m_compress_flags |= LZHAM_COMP_FLAG_FORCE_POLAR_CODING;
+    if (lzham_flags & Lzham_Deterministic)
+        params.m_compress_flags |= LZHAM_COMP_FLAG_DETERMINISTIC_PARSING;
     //params.m_compress_flags |= LZHAM_COMP_FLAG_EXTREME_PARSING;
     //params.m_compress_flags |= LZHAM_COMP_FLAG_DETERMINISTIC_PARSING;
     //params.m_compress_flags |= LZHAM_COMP_FLAG_TRADEOFF_DECOMPRESSION_RATE_FOR_COMP_RATIO;
