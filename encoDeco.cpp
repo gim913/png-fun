@@ -3,6 +3,7 @@
 #include "wrapLz4.h"
 #include "wrapLzham.h"
 #include "wrapBsc.h"
+#include "wrapDaSh.h"
 
 #include <iostream>
 
@@ -123,6 +124,11 @@ int main(int argc, char **argv)
             }
             std::cout << "lzham " << ((lzham_flags&Lzham_Polar)?"":"NOT ") << "using polar coordinates" << std::endl;
             std::cout << "lzham " << ((lzham_flags&Lzham_Deterministic)?"":"NOT ") << "using deterministic compression" << std::endl;
+            break;
+        case 'd':
+            gimInflate = &dash_inflate;
+            gimDeflate = &dash_deflate;
+            std::cout << "dash" << std::endl;
             break;
         case 'b':
             gimDeflate = &bsc_deflate;
