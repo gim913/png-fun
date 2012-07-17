@@ -80,7 +80,8 @@ int main(int argc, char **argv)
         std::cout << "\t\tnumber 0-4 - compression level\n";
         std::cout << "\t\td|p|dp - deterministic compression, polar coordinates, both\n";
         std::cout << "\t\t\te.g: h4dp\n";
-        std::cout << "\tb - to use bsc algorithm, can be followed by\n";
+        std::cout << "\tb - to use bsc algorithm, can be followed by:\n";
+        std::cout << "\t\tf - fast mode in bsc features flags\n";
         return -1;
     }
     if (argc > 4) do_dump = 1;
@@ -107,16 +108,16 @@ int main(int argc, char **argv)
             }
             std::cout << "lzham using compression level: " << lzham_level << std::endl;
             if (strlen(argv[1]) > 2) {
-                if (argv[1][2] == 'p') {
+                if ('p' == argv[1][2]) {
                     lzham_flags |= Lzham_Polar;
-                } else if (argv[1][2] == 'd') {
+                } else if ('d' == argv[1][2]) {
                     lzham_flags |= Lzham_Deterministic;
                 }
             }
             if (strlen(argv[1]) > 3) {
-                if (argv[1][3] == 'p') {
+                if ('p' == argv[1][3]) {
                     lzham_flags |= Lzham_Polar;
-                } else if (argv[1][3] == 'd') {
+                } else if ('d' == argv[1][3]) {
                     lzham_flags |= Lzham_Deterministic;
                 }
             }
@@ -127,6 +128,12 @@ int main(int argc, char **argv)
             gimDeflate = &bsc_deflate;
             gimInflate = &bsc_inflate;
             std::cout << "bsc" << std::endl;
+            if (strlen(argv[1]) > 1) {
+                if (argv[1][1] == 'f') {
+                    bsc_fast = 1;
+                }
+            }
+            std::cout << "bsc " << (bsc_fast?"":"NOT ") << "using fast mode" << std::endl;
             break;
 
         default:
