@@ -1,5 +1,6 @@
 #pragma once
 
+// since all wrappers needs it anyway, it makes some sense to put it here
 #include "lodepng.h"
 
 #include <gim/base/Memory.hpp>

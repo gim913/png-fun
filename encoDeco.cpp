@@ -2,6 +2,7 @@
 
 #include "wrapLz4.h"
 #include "wrapLzham.h"
+#include "wrapBsc.h"
 
 #include <iostream>
 
@@ -33,10 +34,13 @@ void resave(const char* filename, const char* outName)
 
 #include <cstdio>
 
+int do_dump = 0;
 void hexDump(const MemoryC& mem)
 {
-    /*
-    FILE* fp = fopen("hexdump.bin", "w");
+    if (!do_dump)
+        return;
+
+    FILE* fp = std::fopen("hexdump.bin", "w");
     for (size_t i = 0; i < mem.count; ++i) {
         std::fprintf(fp, "%02x ", mem.ptr[i]);
         if (!((i+1)%16)) {
@@ -44,7 +48,6 @@ void hexDump(const MemoryC& mem)
         }
     }
     std::fclose(fp);
-    */
 }
 
 unsigned lodepng_custom_inflate(
@@ -68,18 +71,23 @@ unsigned lodepng_custom_deflate(
 
 int main(int argc, char **argv)
 {
-    if (argc != 4) {
+    if (argc < 4) {
         std::cout << "syntax error\n";
         std::cout << argv[0] << " [codec] input output\n";
         std::cout << "where [codec] is on of the following:\n";
         std::cout << "\t4 - to use lz4 algorithm\n";
-        std::cout << "\th - to use lzham algorithm, can be followed by\n";
+        std::cout << "\th - to use lzham algorithm, can be followed by:\n";
         std::cout << "\t\tnumber 0-4 - compression level\n";
         std::cout << "\t\td|p|dp - deterministic compression, polar coordinates, both\n";
         std::cout << "\t\t\te.g: h4dp\n";
+        std::cout << "\tb - to use bsc algorithm, can be followed by\n";
         return -1;
     }
-    std::cout << "converting..." << std::endl;
+    if (argc > 4) do_dump = 1;
+    std::cout << "will " << (do_dump?"":"NOT ") << "be doing debug hexdump\n";
+
+    std::cout << "converting algo:";
+
 
     // i'm too lazy to use getopt, 
     switch (argv[1][0]) {
@@ -92,6 +100,7 @@ int main(int argc, char **argv)
         case 'h':
             gimDeflate = &lzham_deflate;
             gimInflate = &lzham_inflate;
+            std::cout << "lzham" << std::endl;
 
             if (strlen(argv[1]) > 1 && std::isdigit(argv[1][1])) {
                 lzham_level =  argv[1][1] - '0';
@@ -114,6 +123,12 @@ int main(int argc, char **argv)
             std::cout << "lzham " << ((lzham_flags&Lzham_Polar)?"":"NOT ") << "using polar coordinates" << std::endl;
             std::cout << "lzham " << ((lzham_flags&Lzham_Deterministic)?"":"NOT ") << "using deterministic compression" << std::endl;
             break;
+        case 'b':
+            gimDeflate = &bsc_deflate;
+            gimInflate = &bsc_inflate;
+            std::cout << "bsc" << std::endl;
+            break;
+
         default:
             std::cout << "uknown value in first argument" << std::endl;
             return -1;
