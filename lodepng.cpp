@@ -96,7 +96,7 @@ unsigned lodepng_custom_deflate(unsigned char** out, size_t* outsize,
                                 const LodePNGCompressSettings* settings);
 
 void* lodepng_timer_start();
-void lodepng_timer_stop(const char* prefix, void* timerStartData);
+void lodepng_timer_stop(const char* prefix, void* timerStartData, size_t d1, size_t d2);
 
 /* ////////////////////////////////////////////////////////////////////////// */
 /* ////////////////////////////////////////////////////////////////////////// */
@@ -1292,7 +1292,7 @@ unsigned lodepng_inflate(unsigned char** out, size_t* outsize,
 #ifdef LODEPNG_WANT_TIMER
     void* tempTimer = lodepng_timer_start();
     unsigned error = lodepng_custom_inflate(out, outsize, in, insize, settings);
-    lodepng_timer_stop("custom load", tempTimer);
+    lodepng_timer_stop("custom load", tempTimer, insize, *outsize);
     return error;
 #else
     return lodepng_custom_inflate(out, outsize, in, insize, settings);
@@ -1311,7 +1311,7 @@ unsigned lodepng_inflate(unsigned char** out, size_t* outsize,
     *out = v.data;
     *outsize = v.size;
 #ifdef LODEPNG_WANT_TIMER
-    lodepng_timer_stop("original load", tempTimer);
+    lodepng_timer_stop("original load", tempTimer, insize, *outsize);
 #endif
     return error;
 #if LODEPNG_CUSTOM_ZLIB_DECODER == 2
@@ -2006,7 +2006,7 @@ static unsigned lodepng_deflatev(ucvector* out, const unsigned char* in, size_t 
 #ifdef LODEPNG_WANT_TIMER
     void* tempTimer = lodepng_timer_start();
     unsigned error = lodepng_custom_deflate(out2, outsize, in, insize, settings);
-    lodepng_timer_stop("custom save", tempTimer);
+    lodepng_timer_stop("custom save", tempTimer, insize, *outsize);
 #else
     unsigned error = lodepng_custom_deflate(out2, outsize, in, insize, settings);
 #endif
@@ -2057,7 +2057,7 @@ static unsigned lodepng_deflatev(ucvector* out, const unsigned char* in, size_t 
     hash_cleanup(&hash);
 
 #ifdef LODEPNG_WANT_TIMER
-    lodepng_timer_stop("original save", tempTimer);
+    lodepng_timer_stop("original save", tempTimer, insize, out->size);
 #endif
 
     return error;

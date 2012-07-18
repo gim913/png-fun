@@ -30,7 +30,7 @@ unsigned int lzham_inflate(Gubyte** out, size_t* outSize, const MemoryC& input, 
     lzham_decompress_status_t status;
     size_t inBufSize = input.count - 4; // -4 due to appended CRC crap ;p
     status = lzham_decompress(decompState, input.ptr, &inBufSize, *out, outSize, 1);
-    hexDump(MemoryC(*out, *outSize));
+    //hexDump(MemoryC(*out, *outSize));
     if (LZHAM_DECOMP_STATUS_SUCCESS != status) {
         std::fprintf(stderr, "decompression error [%d]\n", status);
         return Error_General_Decompression;
@@ -72,7 +72,7 @@ unsigned int lzham_deflate(Gubyte** out, size_t* outSize, const MemoryC& input, 
 
     lzham_compress_status_t status;
     size_t inBufSize = input.count;
-    hexDump(input);
+    //hexDump(input);
     //status = lzham_compress(compState, input.ptr, &inBufSize, *out, outSize, 1);
     Guint adler = 0;
     status = lzham_compress_memory(&params, *out, outSize, input.ptr, inBufSize, &adler);
