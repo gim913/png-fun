@@ -2,6 +2,8 @@ syntax: glob
 lzham-read-only/
 lz4-read-only/
 libbsc-0b12f29/
+data-shrinker-read-only/
+snappy-read-only/
 bin/
 *~
 *.png
