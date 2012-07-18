@@ -4,6 +4,7 @@
 #include "wrapLzham.h"
 #include "wrapBsc.h"
 #include "wrapDaSh.h"
+#include "wrapSnappy.h"
 
 #include <iostream>
 
@@ -129,6 +130,11 @@ int main(int argc, char **argv)
             gimInflate = &dash_inflate;
             gimDeflate = &dash_deflate;
             std::cout << "dash" << std::endl;
+            break;
+        case 's':
+            gimInflate = &snappy_inflate;
+            gimDeflate = &snappy_deflate;
+            std::cout << "snappy" << std::endl;
             break;
         case 'b':
             gimDeflate = &bsc_deflate;

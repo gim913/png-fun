@@ -59,13 +59,13 @@ int gimLz4Decompress(const MemoryC& _input, Gubyte* output)
 
         // specific to original implementation, end of stream is 5 literal bytes
         if (0 == inSize) {
-            std::fprintf(stderr, "%d bytes written, quitting, due to lack of more data\n", copied);
+            //std::fprintf(stderr, "%d bytes written, quitting, due to lack of more data\n", copied);
             break; // !!! !!! !!!
         }
 
         //get offset
         if (2 > inSize) {
-            std::fprintf(stderr, "insize: %d, output: %d, len: %d\n", inSize, copied, len);
+            std::fprintf(stderr, __FILE__ "ERROR: insize: %d, output: %d, len: %d\n", inSize, copied, len);
             return -Error_Premature_End_Of_Data;
         }
         Gushort offset = *(Gushort*)input;
@@ -134,8 +134,6 @@ int gimLz4Decompress(const MemoryC& _input, Gubyte* output)
 
 unsigned int lz4_inflate(Gubyte** out, size_t* outSize, const MemoryC& input, const LodePNGDecompressSettings& settings)
 {
-    std::fprintf(stderr, "inflate ptr: %8p, %d in: %d\n", *out, *outSize, input.count);
-    
     // -4 due to appended CRC crap ;p
     //int res = LZ4_uncompress(inMem, outMem, inSize - 4);
     int res = gimLz4Decompress(MemoryC(input.ptr, input.count - 4), *out);
@@ -158,7 +156,6 @@ unsigned int lz4_deflate(Gubyte** out, size_t* outSize, const MemoryC& input, co
         }
         *out = static_cast<unsigned char*>( temp );
     }
-    std::fprintf(stderr, "deflate ptr: %8p, %d in: %d\n", *out, *outSize, input.count);
     *outSize = 0;
     int res = LZ4_compressHC(input.as<const char>().ptr, reinterpret_cast<char*>(*out), input.count);
     if (res < 0) {
@@ -166,7 +163,6 @@ unsigned int lz4_deflate(Gubyte** out, size_t* outSize, const MemoryC& input, co
         return Error_General_Compression;
     }
     *outSize = res;
-    std::fprintf(stderr, "deflate outSize: %d\n", res);
 
     return 0;
 }

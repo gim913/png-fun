@@ -17,7 +17,6 @@ unsigned int dash_inflate(Gubyte** output, size_t* outSize, const MemoryC& input
     }
 
     *outSize = res;
-    std::fprintf(stderr, "inflate insize: %d outSize: %d\n", input.count, *outSize);
 
     return 0;
 }
@@ -34,7 +33,6 @@ unsigned int dash_deflate(Gubyte** out, size_t* outSize, const MemoryC& input, c
         }
         *out = static_cast<unsigned char*>( temp );
     }
-    std::fprintf(stderr, "deflate ptr: %8p, %d in: %d\n", *out, *outSize, input.count);
 
     int res = shrinker_compress(const_cast<Gubyte*>(input.ptr), *out, input.count);
     if (res < 0) {
@@ -43,7 +41,6 @@ unsigned int dash_deflate(Gubyte** out, size_t* outSize, const MemoryC& input, c
     }
 
     *outSize = res;
-    std::fprintf(stderr, "deflate outSize: %d\n", res);
 
     return 0;
 }
