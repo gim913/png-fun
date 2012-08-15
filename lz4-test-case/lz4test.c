@@ -2,7 +2,7 @@
 gcc lz4test.c gimDeco.c -o lz4test ../lz4-read-only/lz4hc.o ../lz4-read-only/lz4.o
 md5sum --check test_files.md5
 ./lz4test testcase.bin test_lz4hc_output.bin
-exit 1
+exit 0
 #endif
 
 #include "../lz4-read-only/lz4hc.h"
