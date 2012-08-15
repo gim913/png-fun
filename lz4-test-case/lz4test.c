@@ -62,7 +62,10 @@ int main(int argc, char **argv)
     printf(" [+]   compressed %d to %d\n", inSize, compRet);
     fwrite(outMem, 1, compRet, outFp);
 
-    decompRet = LZ4_uncompress(outMem, decoMem, compRet);
+    decompRet = LZ4_uncompress(outMem, decoMem, inSize);
+    printf(" [+] decompressed processed: %d\n", decompRet);
+
+    decompRet = LZ4_uncompress_unknownOutputSize(outMem, decoMem, compRet, inSize);
     printf(" [+] decompressed %d from %d\n", decompRet, compRet);
 
     decompRet = gimLz4Decompress(outMem, decoMem, compRet);
