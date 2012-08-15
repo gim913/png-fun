@@ -135,8 +135,9 @@ int gimLz4Decompress(const MemoryC& _input, Gubyte* output)
 unsigned int lz4_inflate(Gubyte** out, size_t* outSize, const MemoryC& input, const LodePNGDecompressSettings& settings)
 {
     // -4 due to appended CRC crap ;p
-    //int res = LZ4_uncompress(inMem, outMem, inSize - 4);
-    int res = gimLz4Decompress(MemoryC(input.ptr, input.count - 4), *out);
+    //int res = LZ4_uncompress(input.as<const char>().ptr, reinterpret_cast<char*>(*out), input.count - 4);
+    //int res = gimLz4Decompress(MemoryC(input.ptr, input.count - 4), *out);
+    int res = LZ4_uncompress_unknownOutputSize(input.as<const char>().ptr, reinterpret_cast<char*>(*out), input.count - 4, *outSize);
     if (res < 0) {
         std::fprintf(stderr, "decompression error %d\n", res);
         return -res;
