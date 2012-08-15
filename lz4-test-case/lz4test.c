@@ -1,5 +1,7 @@
 #ifdef SELF_COMPILING_FILE
 gcc lz4test.c gimDeco.c -o lz4test ../lz4-read-only/lz4hc.o ../lz4-read-only/lz4.o
+md5sum --check test_files.md5
+./lz4test testcase.bin test_lz4hc_output.bin
 exit 1
 #endif
 
@@ -13,7 +15,8 @@ int gimLz4Decompress(const unsigned char* input, unsigned char* output, size_t i
 
 int main(int argc, char **argv)
 {
-    FILE* fp;
+    FILE* inFp;
+    FILE* outFp;
     size_t inSize;
     void* inMem;
     void* outMem;
@@ -26,15 +29,18 @@ int main(int argc, char **argv)
 	return -1;
     }
 
-    fp = fopen(argv[1], "rb");
-    if (!fp) {
+    inFp = fopen(argv[1], "rb");
+    outFp = fopen(argv[2], "wb");
+    if (!inFp || !outFp) {
+	fclose(inFp);
+	fclose(outFp);
 	fprintf (stderr, "can't open input: %s\n", argv[1]);
 	return -2;
     }
 
-    fseek(fp, 0, SEEK_END);
-    inSize = (size_t)ftell(fp);
-    fseek(fp, 0, SEEK_SET);
+    fseek(inFp, 0, SEEK_END);
+    inSize = (size_t)ftell(inFp);
+    fseek(inFp, 0, SEEK_SET);
 
     inMem = malloc(inSize);
     decoMem = calloc(inSize, 1);
@@ -43,15 +49,18 @@ int main(int argc, char **argv)
 	free(inMem);
 	free(outMem);
 	free(decoMem);
+	fclose(inFp);
+	fclose(outFp);
 	fprintf (stderr, "oh noez, no mem!\n");
 	return -3;
     }
 
-    fread(inMem, 1, inSize, fp);
-    fclose(fp);
+    fread(inMem, 1, inSize, inFp);
+    fclose(inFp);
 
     compRet = LZ4_compressHC(inMem, outMem, inSize);
     printf(" [+]   compressed %d to %d\n", inSize, compRet);
+    fwrite(outMem, 1, compRet, outFp);
 
     decompRet = LZ4_uncompress(outMem, decoMem, compRet);
     printf(" [+] decompressed %d from %d\n", decompRet, compRet);
@@ -62,6 +71,7 @@ int main(int argc, char **argv)
     free(inMem);
     free(outMem);
     free(decoMem);
+    fclose(outFp);
 
     return 0;
 }
