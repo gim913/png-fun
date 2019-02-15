@@ -2,9 +2,9 @@
 
 ### 2012 Aug 18 ###
 
-I've added results of different versions of lzo, you can see them [here](results_lzo_2012_Aug_18.md).
+I've added results of different versions of lzo, you can see them [here](https://github.com/gim913/png-fun/wiki/results_lzo_2012_Aug_18).
 
-Based on that I've added lzoc1 to the results, you can see updated version [here](results_2012_Aug_18.md).
+Based on that I've added lzoc1 to the results, you can see updated version [here](https://github.com/gim913/png-fun/wiki/results_2012_Aug_18).
 
 ### 2012 Aug 15 ###
 
@@ -66,8 +66,8 @@ penalty on memory allocation.
 
 ## Results ##
 
-**NEW** results are [here](results_2012_Aug_15.md).
-Previous old results are [here](results_2012_Jul_20.md).
+**NEW** results are [here](https://github.com/gim913/png-fun/wiki/results_2012_Aug_18).
+Previous old results are [here](https://github.com/gim913/png-fun/wiki/).
 
 Now what (I think) these results tells us?
 
